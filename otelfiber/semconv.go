@@ -56,7 +56,10 @@ func httpServerTraceAttributesFromRequest(c *fiber.Ctx, cfg config) []attribute.
 	if username, ok := HasBasicAuth(c.Get(fiber.HeaderAuthorization)); ok {
 		attrs = append(attrs, semconv.EnduserIDKey.String(utils.CopyString(username)))
 	}
+
 	clientIP := c.IP()
+	clientIP = c.Get("X-Forwarded-For", clientIP)
+	clientIP = c.Get("X-Real-Ip", clientIP)
 	if len(clientIP) > 0 {
 		attrs = append(attrs, semconv.HTTPClientIPKey.String(utils.CopyString(clientIP)))
 	}
